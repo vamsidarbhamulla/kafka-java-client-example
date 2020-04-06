@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    hostname: zookeeper
+    networks:
+      - kafka_zoo
+  kafka:
+    image: wurstmeister/kafka
+    command: [start-kafka.sh]
+    ports:
+      - "9092:9092"
+    hostname: kafka
+    environment:
+      KAFKA_CREATE_TOPICS: "topic1:1:1,test-stream:1:1" # topic:partition:replicas
+      KAFKA_ADVERTISED_HOST_NAME: ${DOCKERHOST} # docker-machine ip
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_PORT: 9092
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - zookeeper
+    networks:
+      - kafka_zoo
+  manager:
+    image: sheepkiller/kafka-manager
+    ports:
+      - 9000:9000
+    environment:
+      - ZK_HOSTS=zookeeper:2181
+    depends_on:
+      - zookeeper
+    networks:
+      - kafka_zoo
+networks:
+  kafka_zoo:
+    name: kafka_zoo
+volumes:
+  maven_repo:
+    driver: local

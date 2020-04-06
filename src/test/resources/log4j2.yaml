@@ -1,0 +1,17 @@
+Configuration:
+  status: warn
+  Properties:
+    Property:
+      - name: pattern_layout_console
+        value: "%d %level %logger - %-4relative [%thread] - %msg%n"
+  Appenders:
+    Console:
+      name: Console
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "${pattern_layout_console}"
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: Console
